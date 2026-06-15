@@ -9,9 +9,11 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### Eclipse ###
 .apt_generated
@@ -40,3 +42,4 @@ build/
 
 # Chặn cấu hình SmartTomcat
 .smarttomcat/
+tomcat./
