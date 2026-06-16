@@ -16,4 +16,8 @@ public interface JobDao {
     Job updateJob(Job job);
 
     List<Job> findJobsWithHighMinSalary();
+
+    int safeUpdateExpiredJobs();
+
+    int deleteMarkedJobs();
 }

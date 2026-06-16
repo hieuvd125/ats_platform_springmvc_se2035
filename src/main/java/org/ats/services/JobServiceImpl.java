@@ -41,6 +41,16 @@ public class JobServiceImpl implements JobService {
         System.out.println("Số lượng job có lương trên trung bình: " + highSalaryJobs.size());
         System.out.println("--------------------------------");
 
+        System.out.println("--- TEST DEMO CRITERIA UPDATE ---");
+        int updatedRows = jobDao.safeUpdateExpiredJobs();
+        System.out.println("Số lượng job hết hạn đã được cập nhật thành EXPIRED: " + updatedRows);
+        System.out.println("--------------------------------");
+
+        System.out.println("--- TEST DEMO CRITERIA DELETE ---");
+        int deletedRows = jobDao.deleteMarkedJobs();
+        System.out.println("Số lượng job đánh dấu xóa đã bị xóa sổ: " + deletedRows);
+        System.out.println("--------------------------------");
+
         return jobDao.findAll(keyword);
     }
 

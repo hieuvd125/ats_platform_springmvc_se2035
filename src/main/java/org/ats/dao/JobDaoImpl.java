@@ -21,15 +21,16 @@ public class JobDaoImpl implements JobDao {
     @Override
     @Transactional
     public Job createJob(Job job) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.persist(job);
         return job;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Job> findByTitle(String title) {
 
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         // JPQL
         TypedQuery<Job> query = session.createQuery("" +
                 "SELECT j FROM Job j WHERE j.title LIKE :param", Job.class);
@@ -98,7 +99,9 @@ public class JobDaoImpl implements JobDao {
         return null;
     }
 
-    // === DEMO SUBQUERIES (Slide 6) ===
+    // === DEMO SUBQUERIES ===
+    // Bài toán tìm kiếm công việc có mức lương tối thiểu cao hơn
+    // mức lương tối thiểu trung bình của tất cả công việc
     @Transactional(readOnly = true)
     public List<Job> findJobsWithHighMinSalary() {
         Session session = sessionFactory.getCurrentSession();
@@ -114,5 +117,38 @@ public class JobDaoImpl implements JobDao {
         cq.select(root).where(cb.gt(root.get("minSalary"), subquery));
 
         return session.createQuery(cq).getResultList();
+    }
+
+    // === DEMO CRITERIA UPDATE ===
+    // Bai toan update cac jobs status thanh EXPIRED khi deadline < GETDATE()
+    @Override
+    @Transactional
+    public int safeUpdateExpiredJobs() {
+        Session session = sessionFactory.getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        java.time.OffsetDateTime now = java.time.ZonedDateTime.now().toOffsetDateTime();
+
+        CriteriaUpdate<Job> cu = cb.createCriteriaUpdate(Job.class);
+        Root<Job> root = cu.from(Job.class);
+        cu.set(root.get("status"), "EXPIRED");
+        cu.where(cb.lessThan(root.get("deadline"), now));
+
+        return session.createMutationQuery(cu).executeUpdate();
+    }
+
+    // === DEMO CRITERIA DELETE  ===
+    @Override
+    @Transactional
+    public int deleteMarkedJobs() {
+        Session session = sessionFactory.getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaDelete<Job> cd = cb.createCriteriaDelete(Job.class);
+        Root<Job> root = cd.from(Job.class);
+
+        cd.where(cb.equal(root.get("isDeleted"), true));
+
+        return session.createMutationQuery(cd).executeUpdate();
     }
 }
