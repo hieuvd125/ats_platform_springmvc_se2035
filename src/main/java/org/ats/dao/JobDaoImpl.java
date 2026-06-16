@@ -97,4 +97,22 @@ public class JobDaoImpl implements JobDao {
     public Job updateJob(Job job) {
         return null;
     }
+
+    // === DEMO SUBQUERIES (Slide 6) ===
+    @Transactional(readOnly = true)
+    public List<Job> findJobsWithHighMinSalary() {
+        Session session = sessionFactory.getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+        Root<Job> root = cq.from(Job.class);
+
+        Subquery<Double> subquery = cq.subquery(Double.class);
+        Root<Job> subRoot = subquery.from(Job.class);
+
+        subquery.select(cb.avg(subRoot.get("minSalary")));
+
+        cq.select(root).where(cb.gt(root.get("minSalary"), subquery));
+
+        return session.createQuery(cq).getResultList();
+    }
 }

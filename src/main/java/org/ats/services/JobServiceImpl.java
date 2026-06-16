@@ -36,6 +36,11 @@ public class JobServiceImpl implements JobService {
             return jobDao.findAll();
         }
 
+        System.out.println("--- TEST DEMO SUBQUERY LOG ---");
+        List<Job> highSalaryJobs = jobDao.findJobsWithHighMinSalary();
+        System.out.println("Số lượng job có lương trên trung bình: " + highSalaryJobs.size());
+        System.out.println("--------------------------------");
+
         return jobDao.findAll(keyword);
     }
 

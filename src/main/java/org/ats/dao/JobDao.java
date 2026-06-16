@@ -14,4 +14,6 @@ public interface JobDao {
     List<Job> findAll();
 
     Job updateJob(Job job);
+
+    List<Job> findJobsWithHighMinSalary();
 }
