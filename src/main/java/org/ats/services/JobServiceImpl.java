@@ -32,11 +32,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<Job> getAll(String keyword) {
-        if (keyword == null) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             return jobDao.findAll();
         }
 
-        return jobDao.findAll("%" + keyword + "%");
+        return jobDao.findAll(keyword);
     }
 
     private Job toEntity(JobRequest jobRequest) {

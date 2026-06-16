@@ -1,6 +1,10 @@
 package org.ats.dao;
 
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.ats.entities.Job;
 import org.hibernate.Session;
@@ -9,6 +13,7 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -37,15 +42,36 @@ public class JobDaoImpl implements JobDao {
         return query.getResultList();
     }
 
+//    @Override
+//    public List<Job> findAll(String keyword) {
+//
+//        Session session = sessionFactory.openSession();
+//        Query<Job> query = session.createQuery("FROM Job j WHERE j.title LIKE :keyword OR j.description LIKE :keyword");
+//        query.setParameter("keyword", keyword);
+//
+//        return query.getResultList();
+//    }
+
     @Override
+    @Transactional(readOnly = true)
     public List<Job> findAll(String keyword) {
+        Session session = sessionFactory.getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+        Root<Job> root = cq.from(Job.class);
 
-        Session session = sessionFactory.openSession();
-        Query<Job> query = session.createQuery("FROM Job j WHERE j.title LIKE :keyword OR j.description LIKE :keyword");
-        query.setParameter("keyword", keyword);
+        List<Predicate> predicates = new ArrayList<>();
 
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String likePattern = "%" + keyword + "%";
 
-        return query.getResultList();
+            Predicate titleLike = cb.like(root.get("title"), likePattern, '\\');
+            predicates.add(titleLike);
+        }
+
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+
+        return session.createQuery(cq).getResultList();
     }
 
     @Override

@@ -12,5 +12,6 @@ public interface JobDao {
     List<Job> findAll(String keyword);
 
     List<Job> findAll();
+
     Job updateJob(Job job);
 }
