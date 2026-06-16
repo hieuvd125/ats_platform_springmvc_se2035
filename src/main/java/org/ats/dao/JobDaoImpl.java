@@ -1,10 +1,7 @@
 package org.ats.dao;
 
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.ats.entities.Job;
 import org.hibernate.Session;
@@ -74,11 +71,26 @@ public class JobDaoImpl implements JobDao {
         return session.createQuery(cq).getResultList();
     }
 
+//    @Override
+//    public List<Job> findAll() {
+//        Session session = sessionFactory.openSession();
+//        // Type safe
+//        return session.createQuery("FROM Job", Job.class).getResultList();
+//    }
+
     @Override
+    @Transactional(readOnly = true)
     public List<Job> findAll() {
-        Session session = sessionFactory.openSession();
-        // Type safe
-        return session.createQuery("FROM Job", Job.class).getResultList();
+        Session session = sessionFactory.getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Job> cq = cb.createQuery(Job.class);
+        Root<Job> root = cq.from(Job.class);
+
+        root.fetch("department", JoinType.LEFT);
+
+        cq.select(root);
+
+        return session.createQuery(cq).getResultList();
     }
 
     @Override

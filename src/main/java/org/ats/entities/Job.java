@@ -48,7 +48,7 @@ public class Job extends BaseEntity{
     private OffsetDateTime publishedAt;
 
     @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "dept_id")
+    @JoinColumn(name = "department_id", referencedColumnName = "department_id")
     private Department department;
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)

@@ -15,7 +15,7 @@ import java.util.Set;
 public class Department extends  BaseEntity{
 
     @Id
-    @Column(name = "dept_id")
+    @Column(name = "department_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
